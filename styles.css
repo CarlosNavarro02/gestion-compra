@@ -1,0 +1,59 @@
+:root {
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --text: #1f2933;
+  --muted: #6b7785;
+  --accent: #2f855a;
+  --border: #dde2e8;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14171a;
+    --card: #1e2227;
+    --text: #e6e9ec;
+    --muted: #96a0ab;
+    --accent: #48bb78;
+    --border: #2f353c;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+main { max-width: 640px; margin: 0 auto; padding: 24px 16px; }
+h1 { font-size: 1.6rem; margin: 0 0 16px; }
+
+form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+input, select, button {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+}
+#nombre { flex: 1 1 200px; }
+#cantidad { width: 70px; }
+button { cursor: pointer; }
+button[type="submit"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.filtros { display: flex; gap: 8px; margin-bottom: 12px; }
+.filtros .activo { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+ul { list-style: none; padding: 0; margin: 0; }
+li {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; margin-bottom: 6px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+}
+li .info { flex: 1; }
+li .cat { font-size: 0.8rem; color: var(--muted); }
+li.comprado .nombre { text-decoration: line-through; color: var(--muted); }
+li .borrar { border: none; background: none; color: var(--muted); font-size: 1.1rem; }
+
+.categoria-titulo { margin: 16px 0 6px; font-size: 0.85rem; color: var(--muted); text-transform: uppercase; }
+
+footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; color: var(--muted); }
