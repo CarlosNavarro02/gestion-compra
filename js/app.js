@@ -62,7 +62,7 @@ const $ = sel => document.querySelector(sel);
 const NO_COMIDA = ['Cuidado del cabello', 'Cuidado facial y corporal', 'Limpieza y hogar', 'Maquillaje', 'Mascotas', 'Fitoterapia y parafarmacia', 'Bebé'];
 
 function enlaceMercadona(p, texto = 'Ver en Mercadona') {
-  return p?.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${texto} ↗</a>` : '';
+  return p?.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener" style="white-space:nowrap">${texto}&nbsp;↗</a>` : '';
 }
 
 function mostrarDialogo(html) {
@@ -242,7 +242,7 @@ function detalleReceta(r, { pendiente = false } = {}) {
       </select>` : '';
     return `
       <li>
-        ${el?.producto.img ? `<img src="${esc(el.producto.img)}" alt="" loading="lazy">` : ''}
+        ${el?.producto.img ? `<img src="${esc(el.producto.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : ''}
         <div class="crece">
           <div><b>${textoCantidad(ing, it.cant)}</b> ${esc(ing.nombre)}</div>
           <div class="sutil peq">${el ? `${esc(el.producto.nombre)} · ${euros(el.producto.precio)} · ${enlaceMercadona(el.producto, 'Mercadona')}` : 'Sin producto en Mercadona'}</div>
@@ -296,7 +296,7 @@ function vistaCompra() {
     return `
       <li class="${estado.comprados[it.id] ? 'hecho' : ''}">
         <input type="checkbox" data-accion="comprado" data-id="${esc(it.id)}" ${estado.comprados[it.id] ? 'checked' : ''} aria-label="Comprado: ${esc(it.ing.nombre)}">
-        ${p?.img ? `<img src="${esc(p.img)}" alt="" loading="lazy">` : ''}
+        ${p?.img ? `<img src="${esc(p.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : ''}
         <div class="crece">
           <div class="nombre"><b>${esc(it.ing.nombre)}</b></div>
           <div class="sutil peq">${cuanto}${p?.formato ? ` (${esc(p.formato.toLowerCase())})` : ''}</div>
@@ -393,7 +393,7 @@ function filaProducto(p, extra = '') {
   const cmp = precioComparable(p);
   return `
     <li>
-      ${p.img ? `<img src="${esc(p.img)}" alt="" loading="lazy">` : ''}
+      ${p.img ? `<img src="${esc(p.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : ''}
       <div class="crece">
         <div><b>${esc(p.nombre)}</b> ${extra ? `<span class="insignia">${extra}</span>` : ''}</div>
         <div class="sutil peq">${esc(p.sub)} · ${p.formato ? esc(p.formato) + ' · ' : ''}${enlaceMercadona(p, 'Mercadona')}</div>
