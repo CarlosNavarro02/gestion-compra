@@ -6,12 +6,19 @@ calcula la lista de la compra con los productos más baratos y te dice cuánto v
 ## Qué hace
 
 - **Plan semanal**: desayuno, comida, snack y cena de lunes a domingo, ajustado a tu objetivo de proteína
-  (peso × g/kg). Las comidas y cenas se repiten 2 días seguidos (configurable) para cocinar una vez y tirar de tupper.
-  Cualquier comida se puede marcar como **"como fuera"** y no cuenta para la compra.
+  (peso × g/kg) y de **calorías** (Mifflin-St Jeor según peso, altura, edad, actividad y objetivo: perder, mantener
+  o ganar). Para cuadrar las calorías se ajustan las raciones de arroz, pasta, patata, pan y avena y, si hace falta,
+  el tamaño de los platos. Las comidas y cenas se repiten 2 días seguidos (configurable) para cocinar una vez y tirar
+  de tupper. Cualquier comida se puede marcar como **"como fuera"** y no cuenta para la compra, y con 🔒 se fija un
+  plato para que "Otro plan" no lo cambie.
 - **Recetas**: 27 recetas caseras altas en proteína (varias en airfryer y con congelados), con coste por ración,
   calorías y macros. Puedes cambiar el producto de Mercadona de cada ingrediente.
-- **Lista de la compra**: se genera desde el plan, elige el envase que menos cuesta para la cantidad que necesitas,
-  enlaza cada producto a la tienda online de Mercadona y se puede copiar para mandarla por WhatsApp.
+- **Lista de la compra**: se genera desde el plan, ordenada por pasillos (congelados al final), elige el envase que
+  menos cuesta para la cantidad que necesitas, enlaza cada producto a la tienda online de Mercadona y se puede copiar
+  para mandarla por WhatsApp.
+- **App instalable y sin conexión**: se añade a la pantalla de inicio y funciona sin cobertura con los últimos precios.
+- **Copia de seguridad**: exporta e importa tus datos (plan, ajustes, recetas) en un archivo.
+- **Aviso** si los precios llevan más de 2 días sin actualizarse.
 - **Precios**:
   - buscador de lo más barato por €/kg o €/L,
   - ranking de **proteína barata** (€ por cada 100 g de proteína),
@@ -29,6 +36,7 @@ data/ingredientes.json           Ingredientes base: valores nutricionales + regl
 data/recetas.json                Recetario (cantidades por ración)
 js/motor.js                      Lógica: emparejar productos, costes, nutrición, plan y lista de la compra
 js/app.js                        Interfaz
+sw.js, manifest.webmanifest      Modo sin conexión e instalación como app
 js/generador.js                  Generador de recetas nuevas (combinaciones + cantidades según objetivo)
 scripts/comprobar.mjs            Comprueba que todas las recetas (y las generadas) encuentran producto y tienen precio
 .github/workflows/web.yml        Cada día: descarga precios, comprueba y publica en GitHub Pages

@@ -4,7 +4,8 @@
 
 import fs from 'node:fs';
 import {
-  prepararIngredientes, analizarReceta, generarPlan, listaCompra, resumenDia, COMIDAS,
+  prepararIngredientes, analizarReceta, generarPlan, listaCompra, resumenDia, COMIDAS, FUERA,
+  kcalObjetivo, factorRaciones, escalarReceta,
 } from '../js/motor.js';
 import { crearReceta } from '../js/generador.js';
 
@@ -60,6 +61,43 @@ for (const [tipo, metodo] of [['principal', 'airfryer'], ['principal', 'sarten']
   }
 }
 console.log(`Generador: ${generadas} recetas de prueba creadas`);
+
+// Calorías: el ajuste de raciones debe acercar el plan al objetivo
+const comprobar = (ok, msg) => { if (!ok) { console.error(`✗ ${msg}`); errores++; } };
+for (const ajustes of [
+  { peso: 70, altura: 175, edad: 30, sexo: 'h', actividad: 1.55, objetivo: 'mantener' },
+  { peso: 60, altura: 165, edad: 35, sexo: 'm', actividad: 1.375, objetivo: 'perder' },
+  { peso: 85, altura: 185, edad: 25, sexo: '', actividad: 1.725, objetivo: 'ganar' },
+]) {
+  const kcal = kcalObjetivo(ajustes);
+  const activas = COMIDAS.map(c => c.id);
+  const factor = factorRaciones({ plan, recetasPorId: porId, ings, kcalDia: kcal, activas });
+  const escaladas = Object.fromEntries(recetas.map(r => [r.id, escalarReceta(r, factor, ings)]));
+  const kcalPlan = Math.round(plan.map(d => resumenDia(d, escaladas, ings).kcal).reduce((a, b) => a + b, 0) / 7);
+  const protPlan = Math.round(plan.map(d => resumenDia(d, escaladas, ings).prot).reduce((a, b) => a + b, 0) / 7);
+  console.log(`Calorías ${ajustes.objetivo}: objetivo ${kcal} kcal → plan ${kcalPlan} kcal, ${protPlan} g prot (hidratos ×${factor.base}, platos ×${factor.racion})`);
+  comprobar(Math.abs(kcalPlan - kcal) / kcal < 0.1, `El plan se aleja más de un 10 % del objetivo de ${kcal} kcal`);
+}
+
+// Platos fijados y comidas fuera se respetan al generar otro plan
+{
+  const actual = plan.map(d => ({ ...d }));
+  actual[0].comida = FUERA;
+  const fijados = { '2-cena': true, '4-desayuno': true };
+  const nuevo = generarPlan({ recetas, ings, planActual: actual, activas: COMIDAS.map(c => c.id), fijados, semilla: 99 });
+  comprobar(nuevo[0].comida === FUERA, 'Otro plan no respeta "como fuera"');
+  comprobar(nuevo[2].cena === actual[2].cena && nuevo[4].desayuno === actual[4].desayuno, 'Otro plan no respeta los platos fijados');
+  comprobar(nuevo.every(d => COMIDAS.every(c => d[c.id])), 'Otro plan deja huecos sin rellenar');
+}
+
+// Lista de la compra: ordenada por pasillos y con los congelados al final
+{
+  const items = lista.items.filter(i => !i.ing.despensa);
+  comprobar(items.every((it, i) => i === 0 || items[i - 1].pasillo.orden <= it.pasillo.orden), 'La lista no está ordenada por pasillos');
+  const congelados = items.filter(i => i.pasillo.nombre === 'Congelados');
+  comprobar(congelados.length > 0 && items.at(-1).pasillo.nombre === 'Congelados', 'Los congelados no van al final de la lista');
+  console.log(`Pasillos: ${[...new Set(items.map(i => i.pasillo.nombre))].join(' → ')}`);
+}
 
 if (errores) {
   console.error(`\n${errores} error(es)`);

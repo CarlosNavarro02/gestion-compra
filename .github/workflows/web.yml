@@ -33,7 +33,9 @@ jobs:
       - name: Preparar la web
         run: |
           mkdir _site
-          cp -r index.html css js data _site/
+          cp -r index.html manifest.webmanifest sw.js css js data iconos _site/
+          # Nueva versión de la caché offline en cada publicación
+          sed -i "s/__VERSION__/${GITHUB_SHA::7}-${GITHUB_RUN_NUMBER}/" _site/sw.js
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

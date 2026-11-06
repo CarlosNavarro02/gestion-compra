@@ -1,0 +1,18 @@
+{
+  "name": "Compra Sana",
+  "short_name": "Compra Sana",
+  "description": "Plan semanal alto en proteína con los precios más baratos de Mercadona.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f6f5",
+  "theme_color": "#14805e",
+  "icons": [
+    { "src": "iconos/icono-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "iconos/icono-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "iconos/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "iconos/icono.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

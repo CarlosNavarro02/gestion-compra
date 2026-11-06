@@ -154,7 +154,7 @@ function barajar(lista, rnd) {
  * - Principales (comida/cena): cada receta se repite `repetir` días seguidos (batch cooking).
  * - Prioriza recetas con más proteína por euro.
  */
-export function generarPlan({ recetas, ings, planActual, activas, repetir = 2, semilla = Date.now() }) {
+export function generarPlan({ recetas, ings, planActual, activas, repetir = 2, fijados = {}, semilla = Date.now() }) {
   const rnd = aleatorio(semilla);
   const plan = planVacio();
   const info = Object.fromEntries(recetas.map(r => [r.id, analizarReceta(r, ings)]));
@@ -167,11 +167,13 @@ export function generarPlan({ recetas, ings, planActual, activas, repetir = 2, s
     recetas.filter(r => r.tipo.includes(tipo) && info[r.id].faltan.length === 0)
       .sort((a, b) => puntuar(b) - puntuar(a));
 
+  // Se respetan las comidas fuera y los platos fijados (🔒) del plan actual.
   for (const comida of COMIDAS) {
-    const activa = activas.includes(comida.id);
+    if (!activas.includes(comida.id)) continue;
     for (let d = 0; d < 7; d++) {
-      if (planActual?.[d]?.[comida.id] === FUERA) plan[d][comida.id] = FUERA;
-      else if (!activa) plan[d][comida.id] = null;
+      const actual = planActual?.[d]?.[comida.id];
+      if (actual === FUERA) plan[d][comida.id] = FUERA;
+      else if (actual && fijados[`${d}-${comida.id}`] && recetas.some(r => r.id === actual)) plan[d][comida.id] = actual;
     }
   }
 
@@ -182,7 +184,7 @@ export function generarPlan({ recetas, ings, planActual, activas, repetir = 2, s
     if (!activas.includes(comida.id)) continue;
     let restantes = 0, actual = null;
     for (let d = 0; d < 7; d++) {
-      if (plan[d][comida.id] === FUERA) continue;
+      if (plan[d][comida.id] != null) continue; // fuera o fijado
       if (restantes === 0) {
         actual = principales[idx % principales.length];
         idx++;
@@ -199,12 +201,99 @@ export function generarPlan({ recetas, ings, planActual, activas, repetir = 2, s
     const opciones = barajar(porTipo(comida.tipo).slice(0, 5), rnd).slice(0, 3);
     let i = 0;
     for (let d = 0; d < 7; d++) {
-      if (plan[d][comida.id] === FUERA || !opciones.length) continue;
+      if (plan[d][comida.id] != null || !opciones.length) continue; // fuera o fijado
       plan[d][comida.id] = opciones[i % opciones.length].id;
       i++;
     }
   }
   return plan;
+}
+
+// ---------- Calorías ----------
+
+/** Reparto orientativo de las calorías del día entre comidas. */
+export const REPARTO = { desayuno: 0.25, comida: 0.35, snack: 0.10, cena: 0.30 };
+export const ACTIVIDADES = [
+  [1.2, 'Sedentaria (poco o nada de ejercicio)'],
+  [1.375, 'Ligera (1-3 días de ejercicio)'],
+  [1.55, 'Moderada (3-5 días de ejercicio)'],
+  [1.725, 'Alta (6-7 días de ejercicio)'],
+];
+export const OBJETIVOS = [['perder', 'Perder grasa (−15 %)'], ['mantener', 'Mantener peso'], ['ganar', 'Ganar músculo (+10 %)']];
+
+/** Calorías diarias: Mifflin-St Jeor × actividad × objetivo, o el valor fijado a mano. */
+export function kcalObjetivo({ peso, altura, edad, sexo, actividad, objetivo, kcalManual }) {
+  if (kcalManual > 0) return Math.round(kcalManual);
+  const s = sexo === 'h' ? 5 : sexo === 'm' ? -161 : -78; // sin indicar: punto medio
+  const basal = 10 * peso + 6.25 * altura - 5 * edad + s;
+  const ajuste = { perder: 0.85, mantener: 1, ganar: 1.1 }[objetivo] ?? 1;
+  return Math.round((basal * actividad * ajuste) / 10) * 10;
+}
+
+const SIN_AJUSTE = { base: 1, racion: 1 };
+
+/**
+ * Copia de la receta con las raciones ajustadas:
+ * - `base`: multiplica los hidratos "base" (arroz, pasta, patata, pan, avena…).
+ * - `racion`: multiplica el plato entero (solo para subir calorías; también sube la proteína).
+ */
+export function escalarReceta(receta, factor = SIN_AJUSTE, ings) {
+  const { base = 1, racion = 1 } = factor;
+  if (Math.abs(base - 1) < 0.01 && Math.abs(racion - 1) < 0.01) return receta;
+  return {
+    ...receta,
+    factor: { base, racion },
+    ingredientes: receta.ingredientes.map(it => {
+      const ing = ings[it.id];
+      if (!ing || ing.sin_precio) return it;
+      const f = (ing.base ? base : 1) * racion;
+      if (Math.abs(f - 1) < 0.01) return it;
+      const cant = ing.u === 'ud' ? Math.max(1, Math.round(it.cant * f)) : Math.max(5, Math.round((it.cant * f) / 5) * 5);
+      return { ...it, cant };
+    }),
+  };
+}
+
+/**
+ * Ajuste semanal de raciones para acercarse al objetivo de calorías. Un único ajuste para toda la semana,
+ * para que los tuppers de un mismo plato lleven lo mismo. Solo cuentan las comidas en casa (no "como fuera").
+ * 1) Se ajustan los hidratos base entre ×0,4 y ×1,8.
+ * 2) Si con eso no se llega, los platos enteros crecen hasta ×1,6 (nunca se reducen: la proteína se mantiene).
+ */
+export function factorRaciones({ plan, recetasPorId, ings, kcalDia, activas }) {
+  const total = activas.reduce((s, id) => s + (REPARTO[id] || 0), 0) || 1;
+  let objetivo = 0, fijas = 0, ajustables = 0;
+  for (const dia of plan) {
+    for (const c of COMIDAS) {
+      if (!activas.includes(c.id)) continue;
+      const r = recetasPorId[dia[c.id]];
+      if (!r) continue;
+      objetivo += kcalDia * (REPARTO[c.id] / total);
+      for (const it of r.ingredientes) {
+        const ing = ings[it.id];
+        if (!ing) continue;
+        const g = ing.u === 'ud' ? it.cant * (ing.g_ud || 0) : it.cant;
+        const k = (ing.n[0] * g) / 100;
+        if (ing.base) ajustables += k; else fijas += k;
+      }
+    }
+  }
+  if (!ajustables || !objetivo) return { ...SIN_AJUSTE };
+  const redondear = x => Math.round(x * 20) / 20;
+  const ideal = (objetivo - fijas) / ajustables;
+  const base = redondear(Math.min(1.8, Math.max(0.4, ideal)));
+  let racion = 1;
+  if (ideal > 1.8) racion = redondear(Math.min(1.6, objetivo / (fijas + ajustables * base)));
+  return { base, racion };
+}
+
+/** Texto corto del ajuste, p. ej. "arroz, pasta… ×1,4 y platos un 20 % más grandes". */
+export function textoAjuste({ base = 1, racion = 1 } = {}) {
+  const partes = [];
+  const n = x => x.toFixed(2).replace(/0$/, '').replace('.', ',');
+  if (Math.abs(base - 1) >= 0.05) partes.push(`arroz, pasta, patata, pan y avena ×${n(base)}`);
+  if (racion > 1.04) partes.push(`platos un ${Math.round((racion - 1) * 100)} % más grandes`);
+  return partes.join(' y ');
 }
 
 /** Totales por día del plan. */
@@ -266,10 +355,35 @@ export function listaCompra(plan, recetasPorId, ings) {
     }
     items.push(item);
   }
+  for (const it of items) it.pasillo = pasillo(it.producto);
   items.sort((a, b) => (a.ing.despensa === b.ing.despensa ? 0 : a.ing.despensa ? 1 : -1)
-    || (a.producto?.cat || 'zz').localeCompare(b.producto?.cat || 'zz')
+    || a.pasillo.orden - b.pasillo.orden
     || a.ing.nombre.localeCompare(b.ing.nombre));
   return { items, totalCaja, totalConsumido };
+}
+
+// Recorrido típico por el súper: lo fresco y lo seco primero, lo refrigerado después y lo congelado al final
+// para que no se caliente en el carro.
+const PASILLOS = [
+  ['Fruta y verdura', ['Fruta y verdura']],
+  ['Panadería', ['Panadería y pastelería']],
+  ['Despensa', ['Arroz, legumbres y pasta', 'Conservas, caldos y cremas', 'Aceite, especias y salsas', 'Cereales y galletas',
+    'Cacao, café e infusiones', 'Azúcar, caramelos y chocolate', 'Aperitivos']],
+  ['Bebidas', ['Zumos', 'Agua y refrescos', 'Bodega']],
+  ['Carne', ['Carne']],
+  ['Pescado y marisco', ['Marisco y pescado']],
+  ['Charcutería y quesos', ['Charcutería y quesos']],
+  ['Lácteos y huevos', ['Huevos, leche y mantequilla', 'Postres y yogures']],
+  ['Platos preparados', ['Pizzas y platos preparados']],
+  ['Congelados', ['Congelados']],
+];
+
+/** Pasillo (y su orden en el recorrido) de un producto. Lo congelado va siempre a "Congelados". */
+export function pasillo(p) {
+  if (!p) return { orden: 99, nombre: 'Otros' };
+  const congelado = /congelad/.test(normalizar(`${p.nombre} ${p.sub}`));
+  const i = congelado ? PASILLOS.length - 1 : PASILLOS.findIndex(([, cats]) => cats.includes(p.cat));
+  return i < 0 ? { orden: 98, nombre: p.cat } : { orden: i, nombre: PASILLOS[i][0] };
 }
 
 /** Envases necesarios y coste en caja de comprar `cant` de un candidato. */

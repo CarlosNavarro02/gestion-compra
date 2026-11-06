@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#14805e"/>
+  <!-- cesta -->
+  <path d="M120 236h272l-26 150a28 28 0 0 1-27.6 23H173.6A28 28 0 0 1 146 386z" fill="#ffffff"/>
+  <path d="M176 236l52-84M336 236l-52-84" stroke="#ffffff" stroke-width="22" stroke-linecap="round" fill="none"/>
+  <path d="M196 284v76M256 284v76M316 284v76" stroke="#14805e" stroke-width="18" stroke-linecap="round"/>
+  <!-- hoja -->
+  <path d="M300 168c8-58 54-92 112-90-2 60-40 104-104 104z" fill="#9be3b9"/>
+  <path d="M306 176c20-28 44-48 74-62" stroke="#14805e" stroke-width="8" stroke-linecap="round" fill="none"/>
+</svg>
