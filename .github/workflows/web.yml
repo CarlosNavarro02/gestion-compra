@@ -1,0 +1,51 @@
+name: Precios y web
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 5 * * *" # todos los días ~06:17 (hora de Madrid en invierno)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  construir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Descargar precios de Mercadona
+        # Si Mercadona falla o cambia su API, se publica la última copia guardada en el repo.
+        continue-on-error: true
+        run: python3 scripts/descargar_mercadona.py
+
+      - name: Comprobar que todas las recetas tienen precio
+        run: node scripts/comprobar.mjs
+
+      - name: Preparar la web
+        run: |
+          mkdir _site
+          cp -r index.html css js data _site/
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  publicar:
+    needs: construir
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - id: despliegue
+        uses: actions/deploy-pages@v4

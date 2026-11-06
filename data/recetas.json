@@ -1,0 +1,521 @@
+[
+  {
+    "id": "bowl-avena-batido",
+    "nombre": "Bowl de avena con queso batido y plátano",
+    "tipo": ["desayuno"],
+    "tiempo": 5,
+    "ingredientes": [
+      {"id": "avena", "cant": 50},
+      {"id": "queso_batido", "cant": 200},
+      {"id": "platano", "cant": 120},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Pon el queso batido en un bol y mézclalo con la avena.",
+      "Corta el plátano en rodajas por encima y espolvorea canela.",
+      "Si lo preparas la noche anterior, la avena queda más blanda (tipo overnight oats)."
+    ]
+  },
+  {
+    "id": "tostadas-huevo-pavo",
+    "nombre": "Tostadas integrales con huevos revueltos y pavo",
+    "tipo": ["desayuno"],
+    "tiempo": 10,
+    "ingredientes": [
+      {"id": "pan_integral", "cant": 60},
+      {"id": "huevo", "cant": 2},
+      {"id": "pavo_lonchas", "cant": 40},
+      {"id": "aceite", "cant": 3},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Tuesta el pan.",
+      "Bate los huevos con una pizca de sal y cuájalos en una sartén con unas gotas de aceite, removiendo.",
+      "Sirve el revuelto sobre las tostadas con las lonchas de pavo."
+    ]
+  },
+  {
+    "id": "tortilla-claras-espinacas",
+    "nombre": "Tortilla de claras con espinacas y tostada",
+    "tipo": ["desayuno"],
+    "tiempo": 10,
+    "ingredientes": [
+      {"id": "claras", "cant": 200},
+      {"id": "huevo", "cant": 1},
+      {"id": "espinacas", "cant": 100},
+      {"id": "pan_integral", "cant": 40},
+      {"id": "aceite", "cant": 3},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Saltea las espinacas (pueden ir congeladas) un par de minutos en la sartén con unas gotas de aceite.",
+      "Bate las claras con el huevo, sal y pimienta, y viértelo sobre las espinacas.",
+      "Cuaja a fuego medio, dale la vuelta y sirve con la tostada."
+    ]
+  },
+  {
+    "id": "bowl-batido-frutos-rojos",
+    "nombre": "Queso batido con frutos rojos y cacahuete",
+    "tipo": ["desayuno", "snack"],
+    "tiempo": 3,
+    "ingredientes": [
+      {"id": "queso_batido", "cant": 250},
+      {"id": "frutos_rojos", "cant": 100},
+      {"id": "cacahuete", "cant": 15}
+    ],
+    "pasos": [
+      "Descongela los frutos rojos la noche anterior en la nevera (o 1 minuto en el microondas).",
+      "Mézclalos con el queso batido y añade los cacahuetes picados por encima."
+    ]
+  },
+  {
+    "id": "tortitas-avena-claras",
+    "nombre": "Tortitas de avena, claras y plátano",
+    "tipo": ["desayuno"],
+    "tiempo": 15,
+    "ingredientes": [
+      {"id": "avena", "cant": 50},
+      {"id": "claras", "cant": 150},
+      {"id": "platano", "cant": 100},
+      {"id": "queso_batido", "cant": 100},
+      {"id": "aceite", "cant": 2}
+    ],
+    "pasos": [
+      "Tritura la avena, las claras y medio plátano hasta tener una masa.",
+      "Haz tortitas pequeñas en una sartén antiadherente con unas gotas de aceite, 1-2 minutos por cada lado.",
+      "Sirve con el queso batido y el resto del plátano en rodajas."
+    ]
+  },
+  {
+    "id": "pollo-airfryer-verduras",
+    "nombre": "Pollo a la airfryer con patata y verduras asadas",
+    "tipo": ["principal"],
+    "tiempo": 30,
+    "airfryer": true,
+    "tupper": true,
+    "ingredientes": [
+      {"id": "pollo_pechuga", "cant": 180},
+      {"id": "patata", "cant": 200},
+      {"id": "calabacin", "cant": 150},
+      {"id": "pimiento", "cant": 100},
+      {"id": "aceite", "cant": 10},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Corta la patata en gajos y las verduras en trozos. Mézclalo con el aceite, sal, pimentón y ajo en polvo.",
+      "Airfryer a 190 °C durante 12 minutos.",
+      "Añade la pechuga en dados, también especiada, y sigue 12-14 minutos más agitando la cesta a mitad.",
+      "Para tuppers: haz 2-3 raciones de golpe y guárdalas hasta 3 días en la nevera."
+    ]
+  },
+  {
+    "id": "pollo-arroz-brocoli",
+    "nombre": "Salteado de pollo con arroz y brócoli",
+    "tipo": ["principal"],
+    "tiempo": 25,
+    "tupper": true,
+    "ingredientes": [
+      {"id": "pollo_pechuga", "cant": 170},
+      {"id": "arroz", "cant": 70},
+      {"id": "brocoli", "cant": 150},
+      {"id": "soja", "cant": 15},
+      {"id": "aceite", "cant": 8},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Cuece el arroz (unos 15-18 minutos) y escúrrelo.",
+      "Saltea el pollo en tiras con el aceite a fuego fuerte hasta que se dore.",
+      "Añade el brócoli congelado y saltea 5-6 minutos más.",
+      "Incorpora el arroz y la salsa de soja, mezcla y sirve."
+    ]
+  },
+  {
+    "id": "salmon-airfryer-judias",
+    "nombre": "Salmón a la airfryer con patata y judías verdes",
+    "tipo": ["principal"],
+    "tiempo": 25,
+    "airfryer": true,
+    "ingredientes": [
+      {"id": "salmon", "cant": 150},
+      {"id": "patata", "cant": 200},
+      {"id": "judia_verde", "cant": 150},
+      {"id": "aceite", "cant": 5},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Corta la patata en dados, alíñala con la mitad del aceite y sal, y ponla en la airfryer a 190 °C 10 minutos.",
+      "Añade el salmón (puede ir congelado: súmale 4 minutos) y sigue 10-12 minutos a 180 °C.",
+      "Mientras, cuece o haz al microondas las judías verdes y alíñalas con el resto del aceite."
+    ]
+  },
+  {
+    "id": "merluza-airfryer-ensalada",
+    "nombre": "Merluza a la airfryer con patata y ensalada",
+    "tipo": ["principal"],
+    "tiempo": 25,
+    "airfryer": true,
+    "ingredientes": [
+      {"id": "merluza", "cant": 220},
+      {"id": "patata", "cant": 200},
+      {"id": "tomate", "cant": 150},
+      {"id": "lechuga", "cant": 60},
+      {"id": "aceite", "cant": 10},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Patata en rodajas finas con un poco de aceite y sal: airfryer a 190 °C 10 minutos.",
+      "Pon encima la merluza con ajo, perejil y unas gotas de aceite; 10-12 minutos más a 180 °C.",
+      "Acompaña con ensalada de lechuga y tomate aliñada con el resto del aceite."
+    ]
+  },
+  {
+    "id": "garbanzos-espinacas-huevo",
+    "nombre": "Garbanzos con espinacas y huevo",
+    "tipo": ["principal"],
+    "tiempo": 20,
+    "tupper": true,
+    "ingredientes": [
+      {"id": "garbanzo_cocido", "cant": 200},
+      {"id": "espinacas", "cant": 150},
+      {"id": "huevo", "cant": 2},
+      {"id": "cebolla", "cant": 50},
+      {"id": "tomate_triturado", "cant": 100},
+      {"id": "aceite", "cant": 10},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Cuece los huevos 10 minutos.",
+      "Sofríe la cebolla picada en el aceite, añade el tomate y una cucharadita de pimentón y comino.",
+      "Añade las espinacas y, cuando estén hechas, los garbanzos escurridos. 5 minutos a fuego suave.",
+      "Sirve con los huevos cocidos en cuartos."
+    ]
+  },
+  {
+    "id": "pasta-bolonesa-pollo",
+    "nombre": "Macarrones a la boloñesa de pollo",
+    "tipo": ["principal"],
+    "tiempo": 25,
+    "tupper": true,
+    "ingredientes": [
+      {"id": "pasta", "cant": 80},
+      {"id": "pollo_picado", "cant": 150},
+      {"id": "tomate_triturado", "cant": 150},
+      {"id": "cebolla", "cant": 50},
+      {"id": "zanahoria", "cant": 50},
+      {"id": "aceite", "cant": 8},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Cuece la pasta según el paquete.",
+      "Sofríe cebolla y zanahoria picadas en el aceite 5 minutos.",
+      "Añade la carne picada, dórala y agrega el tomate triturado con orégano. 10 minutos a fuego medio.",
+      "Mezcla con la pasta. Aguanta muy bien en tupper."
+    ]
+  },
+  {
+    "id": "wrap-pollo",
+    "nombre": "Wraps integrales de pollo y verduras",
+    "tipo": ["principal"],
+    "tiempo": 20,
+    "ingredientes": [
+      {"id": "tortilla_integral", "cant": 80},
+      {"id": "pollo_pechuga", "cant": 150},
+      {"id": "pimiento", "cant": 80},
+      {"id": "cebolla", "cant": 50},
+      {"id": "queso_batido", "cant": 60},
+      {"id": "lechuga", "cant": 30},
+      {"id": "aceite", "cant": 5},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Saltea el pollo en tiras con el pimiento y la cebolla, con comino y pimentón.",
+      "Mezcla el queso batido con sal, limón y ajo en polvo para hacer la salsa.",
+      "Rellena las tortillas con lechuga, el salteado y la salsa, y enróllalas."
+    ]
+  },
+  {
+    "id": "poke-atun",
+    "nombre": "Poke casero de atún, arroz y edamame",
+    "tipo": ["principal"],
+    "tiempo": 20,
+    "tupper": true,
+    "ingredientes": [
+      {"id": "arroz", "cant": 70},
+      {"id": "atun_natural", "cant": 120},
+      {"id": "edamame", "cant": 80},
+      {"id": "aguacate", "cant": 50},
+      {"id": "zanahoria", "cant": 50},
+      {"id": "soja", "cant": 10}
+    ],
+    "pasos": [
+      "Cuece el arroz y déjalo templar.",
+      "Cuece el edamame 4 minutos y pélalo si va con vaina.",
+      "Monta el bol: arroz, atún escurrido, edamame, zanahoria rallada y aguacate en láminas.",
+      "Aliña con salsa de soja. Si es para tupper, añade el aguacate en el momento."
+    ]
+  },
+  {
+    "id": "lomo-airfryer-brocoli",
+    "nombre": "Lomo de cerdo a la airfryer con patata y brócoli",
+    "tipo": ["principal"],
+    "tiempo": 25,
+    "airfryer": true,
+    "tupper": true,
+    "ingredientes": [
+      {"id": "lomo_cerdo", "cant": 170},
+      {"id": "patata", "cant": 200},
+      {"id": "brocoli", "cant": 150},
+      {"id": "aceite", "cant": 8},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Corta el lomo en filetes o dados y especíalo (ajo, pimentón, orégano).",
+      "Patata en dados con aceite y sal: airfryer 190 °C 10 minutos.",
+      "Añade el lomo y el brócoli (congelado vale) y sigue 12 minutos, agitando a mitad."
+    ]
+  },
+  {
+    "id": "contramuslos-arroz",
+    "nombre": "Contramuslos a la airfryer con arroz y ensalada",
+    "tipo": ["principal"],
+    "tiempo": 25,
+    "airfryer": true,
+    "tupper": true,
+    "ingredientes": [
+      {"id": "pollo_contramuslo", "cant": 200},
+      {"id": "arroz", "cant": 70},
+      {"id": "tomate", "cant": 150},
+      {"id": "lechuga", "cant": 50},
+      {"id": "aceite", "cant": 8},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Adoba los contramuslos con pimentón, ajo, sal y un chorrito de aceite.",
+      "Airfryer a 190 °C durante 18-20 minutos, dándoles la vuelta a mitad.",
+      "Cuece el arroz y sirve con ensalada de lechuga y tomate."
+    ]
+  },
+  {
+    "id": "tortilla-patata-light",
+    "nombre": "Tortilla de patata light (huevo y claras) con tomate",
+    "tipo": ["principal"],
+    "tiempo": 30,
+    "airfryer": true,
+    "tupper": true,
+    "ingredientes": [
+      {"id": "huevo", "cant": 2},
+      {"id": "claras", "cant": 150},
+      {"id": "patata", "cant": 200},
+      {"id": "cebolla", "cant": 50},
+      {"id": "tomate", "cant": 150},
+      {"id": "aceite", "cant": 10},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Haz la patata y la cebolla en láminas en la airfryer con un poco de aceite (180 °C, 15 min) en vez de freírlas.",
+      "Bate los huevos con las claras y sal, y mézclalo con la patata.",
+      "Cuaja la tortilla en una sartén pequeña con unas gotas de aceite, por los dos lados.",
+      "Acompaña con tomate aliñado."
+    ]
+  },
+  {
+    "id": "gambas-quinoa",
+    "nombre": "Gambas salteadas con quinoa y verduras",
+    "tipo": ["principal"],
+    "tiempo": 20,
+    "tupper": true,
+    "ingredientes": [
+      {"id": "gambas", "cant": 150},
+      {"id": "quinoa", "cant": 70},
+      {"id": "salteado_verduras", "cant": 200},
+      {"id": "aceite", "cant": 10},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Lava la quinoa y cuécela 12-15 minutos en el doble de agua.",
+      "Saltea las verduras congeladas a fuego fuerte con la mitad del aceite.",
+      "Saltea aparte las gambas con ajo y el resto del aceite (2-3 minutos).",
+      "Mezcla todo y ajusta de sal."
+    ]
+  },
+  {
+    "id": "tofu-wok-arroz",
+    "nombre": "Tofu crujiente (airfryer) con wok de verduras y arroz",
+    "tipo": ["principal"],
+    "tiempo": 25,
+    "airfryer": true,
+    "tupper": true,
+    "ingredientes": [
+      {"id": "tofu", "cant": 200},
+      {"id": "arroz", "cant": 60},
+      {"id": "salteado_verduras", "cant": 200},
+      {"id": "soja", "cant": 15},
+      {"id": "aceite", "cant": 8}
+    ],
+    "pasos": [
+      "Escurre bien el tofu, córtalo en dados y mézclalo con la mitad de la soja.",
+      "Airfryer a 200 °C 15 minutos, agitando dos veces, hasta que esté crujiente.",
+      "Cuece el arroz y saltea las verduras con el aceite y el resto de la soja.",
+      "Junta todo en el plato."
+    ]
+  },
+  {
+    "id": "alubias-pollo",
+    "nombre": "Alubias blancas guisadas con pollo",
+    "tipo": ["principal"],
+    "tiempo": 25,
+    "tupper": true,
+    "ingredientes": [
+      {"id": "alubia_cocida", "cant": 200},
+      {"id": "pollo_pechuga", "cant": 120},
+      {"id": "pimiento", "cant": 80},
+      {"id": "cebolla", "cant": 50},
+      {"id": "tomate_triturado", "cant": 100},
+      {"id": "aceite", "cant": 8},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Sofríe cebolla y pimiento picados en el aceite.",
+      "Añade el pollo en dados y dóralo.",
+      "Agrega el tomate, pimentón, un vaso pequeño de agua y las alubias escurridas. 10 minutos a fuego suave."
+    ]
+  },
+  {
+    "id": "lentejas-verduras-huevo",
+    "nombre": "Lentejas rápidas con verduras y huevo",
+    "tipo": ["principal"],
+    "tiempo": 20,
+    "tupper": true,
+    "ingredientes": [
+      {"id": "lenteja_cocida", "cant": 250},
+      {"id": "zanahoria", "cant": 60},
+      {"id": "pimiento", "cant": 60},
+      {"id": "cebolla", "cant": 50},
+      {"id": "tomate_triturado", "cant": 80},
+      {"id": "huevo", "cant": 2},
+      {"id": "aceite", "cant": 8},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Cuece los huevos 10 minutos.",
+      "Sofríe cebolla, zanahoria y pimiento picados. Añade tomate, pimentón y comino.",
+      "Incorpora las lentejas lavadas con un poco de agua y deja 10 minutos.",
+      "Sirve con los huevos picados por encima."
+    ]
+  },
+  {
+    "id": "ensalada-garbanzos-atun",
+    "nombre": "Ensalada completa de garbanzos, huevo y atún",
+    "tipo": ["principal"],
+    "tiempo": 15,
+    "tupper": true,
+    "ingredientes": [
+      {"id": "garbanzo_cocido", "cant": 150},
+      {"id": "huevo", "cant": 2},
+      {"id": "atun_natural", "cant": 80},
+      {"id": "tomate", "cant": 150},
+      {"id": "pimiento", "cant": 50},
+      {"id": "lechuga", "cant": 50},
+      {"id": "aceite", "cant": 10},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Cuece los huevos 10 minutos.",
+      "Escurre y lava los garbanzos.",
+      "Pica tomate y pimiento, y mezcla con la lechuga, los garbanzos y el atún.",
+      "Añade el huevo en cuartos y aliña con aceite, vinagre y sal."
+    ]
+  },
+  {
+    "id": "pavo-quinoa-calabacin",
+    "nombre": "Pavo a la plancha con quinoa y calabacín",
+    "tipo": ["principal"],
+    "tiempo": 20,
+    "tupper": true,
+    "ingredientes": [
+      {"id": "pavo_filetes", "cant": 180},
+      {"id": "quinoa", "cant": 70},
+      {"id": "calabacin", "cant": 200},
+      {"id": "aceite", "cant": 10},
+      {"id": "especias", "cant": 1}
+    ],
+    "pasos": [
+      "Cuece la quinoa 12-15 minutos.",
+      "Haz el calabacín en rodajas a la plancha (o en la airfryer 10 min a 190 °C).",
+      "Haz los filetes de pavo a la plancha con sal y pimienta, 3 minutos por lado."
+    ]
+  },
+  {
+    "id": "huevos-cocidos-manzana",
+    "nombre": "Huevos cocidos y manzana",
+    "tipo": ["snack"],
+    "tiempo": 10,
+    "ingredientes": [
+      {"id": "huevo", "cant": 2},
+      {"id": "manzana", "cant": 150}
+    ],
+    "pasos": [
+      "Cuece varios huevos de golpe (10 minutos) y guárdalos en la nevera para toda la semana.",
+      "Acompaña con una manzana."
+    ]
+  },
+  {
+    "id": "tostada-hummus-pavo",
+    "nombre": "Tostada con hummus y pavo",
+    "tipo": ["snack"],
+    "tiempo": 5,
+    "ingredientes": [
+      {"id": "pan_integral", "cant": 40},
+      {"id": "hummus", "cant": 30},
+      {"id": "pavo_lonchas", "cant": 50}
+    ],
+    "pasos": [
+      "Tuesta el pan, unta el hummus y pon el pavo por encima."
+    ]
+  },
+  {
+    "id": "batido-proteico-casero",
+    "nombre": "Batido proteico casero (sin proteína en polvo)",
+    "tipo": ["snack", "desayuno"],
+    "tiempo": 5,
+    "ingredientes": [
+      {"id": "leche", "cant": 250},
+      {"id": "queso_batido", "cant": 150},
+      {"id": "platano", "cant": 120},
+      {"id": "avena", "cant": 30},
+      {"id": "crema_cacahuete", "cant": 10}
+    ],
+    "pasos": [
+      "Tritura todo en la batidora hasta que quede fino. Si lo quieres más frío, usa el plátano congelado."
+    ]
+  },
+  {
+    "id": "rollitos-pavo-mozzarella",
+    "nombre": "Rollitos de pavo y mozzarella light",
+    "tipo": ["snack"],
+    "tiempo": 5,
+    "ingredientes": [
+      {"id": "pavo_lonchas", "cant": 60},
+      {"id": "mozzarella_light", "cant": 60},
+      {"id": "tomate", "cant": 80}
+    ],
+    "pasos": [
+      "Corta la mozzarella y el tomate en tiras, envuélvelos con las lonchas de pavo y añade orégano."
+    ]
+  },
+  {
+    "id": "yogur-griego-nueces",
+    "nombre": "Yogur griego ligero con avena y crema de cacahuete",
+    "tipo": ["snack"],
+    "tiempo": 3,
+    "ingredientes": [
+      {"id": "yogur_griego_light", "cant": 125},
+      {"id": "queso_batido", "cant": 100},
+      {"id": "avena", "cant": 20},
+      {"id": "crema_cacahuete", "cant": 10}
+    ],
+    "pasos": [
+      "Mezcla el yogur con el queso batido, añade la avena y la crema de cacahuete por encima."
+    ]
+  }
+]
