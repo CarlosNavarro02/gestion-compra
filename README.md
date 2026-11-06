@@ -16,8 +16,10 @@ calcula la lista de la compra con los productos más baratos y te dice cuánto v
   - buscador de lo más barato por €/kg o €/L,
   - ranking de **proteína barata** (€ por cada 100 g de proteína),
   - productos que han **bajado de precio**.
-- **Recetas con IA** (opcional): con una API key de Anthropic, pides una receta ("algo con salmón para cenar")
-  y Claude la crea usando solo ingredientes con precio en Mercadona. La key se guarda solo en tu navegador.
+- **Crear recetas nuevas** (gratis, sin IA ni API): eliges tipo (comida/cena, desayuno, snack), forma de cocinar
+  (airfryer, sartén, guiso de legumbre, bol frío) y, si quieres, la proteína. La app combina proteína, base y verduras
+  priorizando lo más barato de Mercadona, ajusta las cantidades a tu objetivo de proteína y escribe los pasos.
+  Las recetas que guardes pueden salir en tus planes semanales.
 
 ## Cómo funciona
 
@@ -27,8 +29,8 @@ data/ingredientes.json           Ingredientes base: valores nutricionales + regl
 data/recetas.json                Recetario (cantidades por ración)
 js/motor.js                      Lógica: emparejar productos, costes, nutrición, plan y lista de la compra
 js/app.js                        Interfaz
-js/ia.js                         Generación de recetas con Claude (se carga solo si la usas)
-scripts/comprobar.mjs            Comprueba que todas las recetas encuentran producto y tienen precio
+js/generador.js                  Generador de recetas nuevas (combinaciones + cantidades según objetivo)
+scripts/comprobar.mjs            Comprueba que todas las recetas (y las generadas) encuentran producto y tienen precio
 .github/workflows/web.yml        Cada día: descarga precios, comprueba y publica en GitHub Pages
 ```
 

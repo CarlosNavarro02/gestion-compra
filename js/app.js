@@ -2,6 +2,7 @@ import {
   DIAS, COMIDAS, FUERA, prepararIngredientes, analizarReceta, generarPlan, resumenDia,
   listaCompra, buscarProductos, precioComparable, rankingProteina, textoCantidad,
 } from './motor.js';
+import { crearReceta, proteinasDisponibles, METODOS } from './generador.js';
 
 // ---------- Estado ----------
 
@@ -11,7 +12,6 @@ const AJUSTES_INICIALES = {
   gkg: 1.8,
   activas: COMIDAS.map(c => c.id),
   repetir: 2,
-  apiKey: '',
 };
 
 let estado = cargarEstado();
@@ -23,21 +23,24 @@ let vista = 'plan';
 let filtroRecetas = 'todas';
 let busquedaRecetas = '';
 let subPrecios = 'buscar';
-let recetaPendiente = null; // receta IA generada aún sin guardar
+let recetaPendiente = null; // receta creada aún sin guardar
+let creador = { tipo: 'principal', metodo: '', proteina: '' };
 let recetaAbierta = null;   // receta mostrada en el diálogo
 
 function cargarEstado() {
   try {
     const e = JSON.parse(localStorage.getItem(CLAVE)) || {};
+    const ajustes = { ...AJUSTES_INICIALES, ...(e.ajustes || {}) };
+    delete ajustes.apiKey; // de la versión con IA, ya no se usa
     return {
-      ajustes: { ...AJUSTES_INICIALES, ...(e.ajustes || {}) },
+      ajustes,
       plan: e.plan || null,
       elecciones: e.elecciones || {},
       comprados: e.comprados || {},
-      recetasIA: e.recetasIA || [],
+      recetasPropias: e.recetasPropias || [],
     };
   } catch {
-    return { ajustes: { ...AJUSTES_INICIALES }, plan: null, elecciones: {}, comprados: {}, recetasIA: [] };
+    return { ajustes: { ...AJUSTES_INICIALES }, plan: null, elecciones: {}, comprados: {}, recetasPropias: [] };
   }
 }
 
@@ -45,7 +48,7 @@ function guardar() {
   try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch { /* sin almacenamiento */ }
 }
 
-const recetas = () => [...recetasBase, ...estado.recetasIA];
+const recetas = () => [...recetasBase, ...estado.recetasPropias];
 const recetasPorId = () => Object.fromEntries(recetas().map(r => [r.id, r]));
 const objetivoProt = () => Math.round(estado.ajustes.peso * estado.ajustes.gkg);
 
@@ -168,21 +171,21 @@ function hueco(dia, d, comida, porId) {
 function vistaRecetas() {
   const filtros = [
     ['todas', 'Todas'], ['desayuno', 'Desayunos'], ['principal', 'Comidas y cenas'], ['snack', 'Snacks'],
-    ['airfryer', 'Airfryer'], ['tupper', 'Para tupper'], ['ia', 'Mis recetas IA'],
+    ['airfryer', 'Airfryer'], ['tupper', 'Para tupper'], ['propias', 'Mis recetas'],
   ];
   const q = busquedaRecetas.toLowerCase();
   const lista = recetas()
     .filter(r => filtroRecetas === 'todas'
       || (filtroRecetas === 'airfryer' && r.airfryer)
       || (filtroRecetas === 'tupper' && r.tupper)
-      || (filtroRecetas === 'ia' && r.ia)
+      || (filtroRecetas === 'propias' && r.propia)
       || r.tipo.includes(filtroRecetas))
     .filter(r => !q || r.nombre.toLowerCase().includes(q))
     .map(r => ({ r, a: analizarReceta(r, ings) }))
     .sort((x, y) => y.a.prot / Math.max(y.a.coste, .3) - x.a.prot / Math.max(x.a.coste, .3));
 
   return `
-    ${tarjetaIA()}
+    ${tarjetaCrear()}
     <input type="search" placeholder="Buscar receta…" value="${esc(busquedaRecetas)}" data-accion="buscar-receta" aria-label="Buscar receta" style="margin-bottom:10px">
     <div class="chips">${filtros.map(([id, t]) => `<button class="chip ${filtroRecetas === id ? 'activa' : ''}" data-accion="filtro-recetas" data-filtro="${id}">${t}</button>`).join('')}</div>
     <p class="sutil peq">Ordenadas por proteína por euro. Precios por ración con los productos más baratos de Mercadona.</p>
@@ -198,32 +201,33 @@ function vistaRecetas() {
             ${r.tipo.map(t => `<span class="insignia">${{ desayuno: 'Desayuno', principal: 'Comida/cena', snack: 'Snack' }[t]}</span>`).join('')}
             ${r.airfryer ? '<span class="insignia">Airfryer</span>' : ''}
             ${r.tupper ? '<span class="insignia">Tupper</span>' : ''}
-            ${r.ia ? '<span class="insignia aviso">IA</span>' : ''}
+            ${r.propia ? '<span class="insignia aviso">Creada por ti</span>' : ''}
           </div>
         </button>`).join('') || '<p class="sutil">No hay recetas con ese filtro.</p>'}
     </div>`;
 }
 
-function tarjetaIA() {
-  if (!estado.ajustes.apiKey) {
-    return `
-      <div class="tarjeta">
-        <div class="fila entre"><h3>✨ Recetas nuevas con IA</h3><span class="insignia aviso">Sin activar</span></div>
-        <p class="sutil">Cuando tengas una API key de Anthropic, podrás pedir recetas nuevas ("algo con salmón para cenar")
-        y la app les pondrá precio con Mercadona. Cuesta unos céntimos por receta.</p>
-        <button class="btn peq" data-accion="ir" data-vista="ajustes">Añadir API key</button>
-      </div>`;
-  }
+function tarjetaCrear() {
+  const { tipo, metodo, proteina } = creador;
+  const proteinas = proteinasDisponibles(tipo, tipo === 'principal' ? metodo : '', ings);
   return `
     <div class="tarjeta pila">
-      <h3>✨ Receta nueva con IA</h3>
-      <div class="fila">
-        <select id="ia-tipo" aria-label="Tipo de receta" style="max-width:150px">
-          <option value="principal">Comida/cena</option><option value="desayuno">Desayuno</option><option value="snack">Snack</option>
+      <h3>🎲 Crear una receta nueva</h3>
+      <p class="sutil peq">Combina una proteína, una base y verduras con lo más barato de Mercadona y ajusta las cantidades a tu objetivo de proteína. Gratis.</p>
+      <div class="fila envolver">
+        <select data-accion="creador" data-campo="tipo" aria-label="Tipo de receta" style="flex:1 1 120px">
+          ${[['principal', 'Comida/cena'], ['desayuno', 'Desayuno'], ['snack', 'Snack']].map(([v, t]) => `<option value="${v}" ${tipo === v ? 'selected' : ''}>${t}</option>`).join('')}
         </select>
-        <input id="ia-peticion" type="text" placeholder="Ej.: algo con salmón y arroz" aria-label="Qué te apetece">
+        ${tipo === 'principal' ? `
+        <select data-accion="creador" data-campo="metodo" aria-label="Cómo cocinarla" style="flex:1 1 120px">
+          ${METODOS.map(([v, t]) => `<option value="${v}" ${metodo === v ? 'selected' : ''}>${v ? t : 'Cualquier forma'}</option>`).join('')}
+        </select>` : ''}
+        <select data-accion="creador" data-campo="proteina" aria-label="Proteína" style="flex:1 1 120px">
+          <option value="">Proteína: la más barata</option>
+          ${proteinas.map(p => `<option value="${p.id}" ${proteina === p.id ? 'selected' : ''}>${esc(p.nombre)}</option>`).join('')}
+        </select>
       </div>
-      <div class="fila"><button class="btn primario" data-accion="generar-ia" id="btn-ia">Generar</button><span id="ia-estado" class="sutil peq"></span></div>
+      <div class="fila"><button class="btn primario" data-accion="crear-receta">Crear receta</button><span id="crear-estado" class="sutil peq"></span></div>
     </div>`;
 }
 
@@ -258,7 +262,7 @@ function detalleReceta(r, { pendiente = false } = {}) {
       <span class="insignia">⏱ ${r.tiempo} min</span>
       ${r.airfryer ? '<span class="insignia">Airfryer</span>' : ''}
       ${r.tupper ? '<span class="insignia">Aguanta en tupper</span>' : ''}
-      ${r.ia ? '<span class="insignia aviso">Generada con IA</span>' : ''}
+      ${r.propia ? '<span class="insignia aviso">Creada por ti</span>' : ''}
     </div>
     <div class="cifras" style="margin-bottom:12px">
       <div class="cifra"><b>${a.prot} g</b><span>proteína</span></div>
@@ -271,8 +275,10 @@ function detalleReceta(r, { pendiente = false } = {}) {
     <h3>Preparación</h3>
     <ol class="pasos">${r.pasos.map(p => `<li>${esc(p)}</li>`).join('')}</ol>
     <p class="sutil peq">Valores nutricionales orientativos.</p>
-    ${pendiente ? `<div class="fila"><button class="btn primario" data-accion="guardar-ia">Guardar en mis recetas</button><button class="btn" data-cerrar>Descartar</button></div>` : ''}
-    ${r.ia && !pendiente ? `<button class="btn-texto" data-accion="borrar-ia" data-id="${esc(r.id)}">Eliminar esta receta</button>` : ''}`;
+    ${pendiente ? `<div class="fila envolver"><button class="btn primario" data-accion="guardar-propia">Guardar en mis recetas</button>
+      <button class="btn" data-accion="crear-receta">🎲 Otra distinta</button><button class="btn-texto" data-cerrar>Descartar</button></div>
+      <p class="sutil peq">Al guardarla, también podrá salir en tus planes semanales.</p>` : ''}
+    ${r.propia && !pendiente ? `<button class="btn-texto" data-accion="borrar-propia" data-id="${esc(r.id)}">Eliminar esta receta</button>` : ''}`;
 }
 
 // ----- Compra -----
@@ -444,16 +450,6 @@ function vistaAjustes() {
       <p class="sutil peq">Los cambios se aplican la próxima vez que generes el plan.</p>
     </div>
     <div class="tarjeta pila">
-      <h3>Recetas con IA</h3>
-      <p class="sutil peq">Pega aquí tu API key de Anthropic (se crea en console.anthropic.com). Se guarda <b>solo en este navegador</b>,
-      nunca se sube al repositorio. Cada receta cuesta unos céntimos.</p>
-      <div class="fila">
-        <input id="api-key" type="password" placeholder="sk-ant-…" value="${esc(a.apiKey)}" autocomplete="off" aria-label="API key de Anthropic">
-        <button class="btn primario" data-accion="guardar-key">Guardar</button>
-      </div>
-      ${a.apiKey ? '<button class="btn-texto" data-accion="borrar-key">Borrar API key</button>' : ''}
-    </div>
-    <div class="tarjeta pila">
       <h3>Datos</h3>
       <p class="sutil peq">${datos.productos.length.toLocaleString('es-ES')} productos de Mercadona (almacén ${esc(datos.almacen)}),
       actualizados ${fechaDatos()}. Se descargan solos cada día desde la tienda online; los precios pueden variar un poco en tienda.</p>
@@ -482,26 +478,17 @@ function generarNuevoPlan() {
   render();
 }
 
-async function generarConIA() {
-  const boton = $('#btn-ia');
-  const info = $('#ia-estado');
-  boton.disabled = true;
-  info.innerHTML = '<span class="cargando"></span> Pensando la receta…';
-  try {
-    const { generarReceta } = await import('./ia.js');
-    const tipo = $('#ia-tipo').value;
-    const objetivo = tipo === 'principal' ? Math.round(objetivoProt() * 0.3) : Math.round(objetivoProt() * 0.18);
-    recetaPendiente = await generarReceta({
-      apiKey: estado.ajustes.apiKey, peticion: $('#ia-peticion').value.trim(), tipo, ings, objetivoProt: objetivo,
-    });
-    info.textContent = '';
-    mostrarDialogo(detalleReceta(recetaPendiente, { pendiente: true }));
-  } catch (e) {
-    console.error(e);
-    info.textContent = e.message || 'No se pudo generar la receta.';
-  } finally {
-    boton.disabled = false;
+function crearNuevaReceta() {
+  const { tipo, metodo, proteina } = creador;
+  const objetivo = Math.round(objetivoProt() * (tipo === 'principal' ? 0.3 : tipo === 'desayuno' ? 0.2 : 0.12));
+  const receta = crearReceta({ tipo, metodo: tipo === 'principal' ? metodo : '', proteina, ings, objetivo, semilla: Math.floor(Math.random() * 1e9) });
+  if (!receta) {
+    const info = $('#crear-estado');
+    if (info) info.textContent = 'No encuentro una combinación con esas opciones. Prueba con otras.';
+    return;
   }
+  recetaPendiente = receta;
+  mostrarDialogo(detalleReceta(receta, { pendiente: true }));
 }
 
 document.addEventListener('click', async e => {
@@ -525,22 +512,20 @@ document.addEventListener('click', async e => {
     try { await navigator.clipboard.writeText(textoLista()); el.textContent = '✓ Copiada'; }
     catch { prompt('Copia la lista:', textoLista()); }
   } else if (accion === 'desmarcar') { estado.comprados = {}; guardar(); render(); }
-  else if (accion === 'generar-ia') generarConIA();
-  else if (accion === 'guardar-ia' && recetaPendiente) {
-    estado.recetasIA.push(recetaPendiente);
+  else if (accion === 'crear-receta') crearNuevaReceta();
+  else if (accion === 'guardar-propia' && recetaPendiente) {
+    estado.recetasPropias.push(recetaPendiente);
     recetaPendiente = null;
-    guardar(); cerrarDialogo(); filtroRecetas = 'ia'; render();
-  } else if (accion === 'borrar-ia') {
+    guardar(); cerrarDialogo(); filtroRecetas = 'propias'; vista = 'recetas'; render();
+  } else if (accion === 'borrar-propia') {
     if (confirm('¿Eliminar esta receta?')) {
-      estado.recetasIA = estado.recetasIA.filter(r => r.id !== el.dataset.id);
+      estado.recetasPropias = estado.recetasPropias.filter(r => r.id !== el.dataset.id);
+      if (estado.plan) estado.plan.forEach(dia => Object.keys(dia).forEach(c => { if (dia[c] === el.dataset.id) dia[c] = null; }));
       guardar(); cerrarDialogo(); render();
     }
-  } else if (accion === 'guardar-key') {
-    estado.ajustes.apiKey = $('#api-key').value.trim();
-    guardar(); render();
-  } else if (accion === 'borrar-key') { estado.ajustes.apiKey = ''; guardar(); render(); }
+  }
   else if (accion === 'reiniciar') {
-    if (confirm('Se borrarán tu plan, ajustes, recetas IA y API key de este navegador. ¿Seguro?')) {
+    if (confirm('Se borrarán tu plan, ajustes y recetas creadas de este navegador. ¿Seguro?')) {
       try { localStorage.removeItem(CLAVE); } catch { /* nada */ }
       estado = cargarEstado(); recalcularIngredientes(); render();
     }
@@ -576,6 +561,11 @@ document.addEventListener('change', e => {
     estado.ajustes.activas = COMIDAS.map(c => c.id).filter(id => set.has(id));
     guardar();
   } else if (accion === 'buscar-producto') pintarResultados();
+  else if (accion === 'creador') {
+    creador[el.dataset.campo] = el.value;
+    if (el.dataset.campo !== 'proteina') creador.proteina = '';
+    render();
+  }
 });
 
 document.addEventListener('input', e => {

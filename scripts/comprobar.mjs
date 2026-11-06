@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import {
   prepararIngredientes, analizarReceta, generarPlan, listaCompra, resumenDia, COMIDAS,
 } from '../js/motor.js';
+import { crearReceta } from '../js/generador.js';
 
 const leer = f => JSON.parse(fs.readFileSync(new URL(`../data/${f}`, import.meta.url)));
 const { productos, actualizado } = leer('mercadona.json');
@@ -46,6 +47,19 @@ if (detalle) {
     console.log(`  ${it.ing.nombre.padEnd(36)} ${String(Math.round(it.cant)).padStart(5)} ${it.ing.u}  → ${it.envases ?? '≈'} × ${it.producto?.nombre} = ${it.costeCaja?.toFixed(2)} €`);
   }
 }
+
+// Generador de recetas: todas las combinaciones deben tener precio
+let generadas = 0;
+for (const [tipo, metodo] of [['principal', 'airfryer'], ['principal', 'sarten'], ['principal', 'guiso'], ['principal', 'frio'], ['desayuno', ''], ['snack', '']]) {
+  for (let semilla = 1; semilla <= 50; semilla++) {
+    const r = crearReceta({ tipo, metodo, ings, objetivo: 35, semilla });
+    if (!r) { console.error(`✗ El generador no crea receta (${tipo} ${metodo})`); errores++; continue; }
+    const a = analizarReceta(r, ings);
+    if (a.faltan.length) { console.error(`✗ Receta generada sin precio: ${r.nombre} (${a.faltan.join(', ')})`); errores++; }
+    generadas++;
+  }
+}
+console.log(`Generador: ${generadas} recetas de prueba creadas`);
 
 if (errores) {
   console.error(`\n${errores} error(es)`);
